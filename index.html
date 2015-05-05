@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Clock</title>
+    <script src="node_modules/jquery/dist/jquery.js"></script>
+    <script src="clock.js"></script>
+    <script>
+    $(window).load(function ()
+    {
+        clock.initDraw("clock");
+    });
+    </script>
+</head>
+<body>
+<canvas id="clock" width="500" height="500">
+</canvas>
+</body>
+</html>
