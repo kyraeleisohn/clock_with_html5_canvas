@@ -1,112 +1,118 @@
-var clock = new Clock();
-
-Clock.prototype.initCanvas = function (canvasId) {
-    canvas = document.getElementById(canvasId);
-    canvas = canvas.getContext("2d");
+const RADIUS = 250;
+const ORIGO = {
+    x : 300,
+    y : 300
 }
-Clock.prototype.initDraw = function (canvasId) {
-    initCanvas(canvasId);
-    draw();
-    timerHandle = setInterval(draw, 5);
+const CANVAS = {
+    width : 600,
+    height : 600
 }
 
 function Clock() {
     var canvas;
     var timerHandle;
-
-    function initDraw(canvasId) {
-        initCanvas(canvasId);
-        draw();
-        timerHandle = setInterval(draw, 5);
-    }
-
-    function draw() {
-        drawFrame();
-
-        var date = new Date();
-
-        drawHours(date.getHours());
-        drawMinutes(date.getMinutes());
-        drawSeconds(date.getSeconds());
-    }
-
-    function initCanvas(canvasId) {
-        canvas = document.getElementById(canvasId);
-        canvas = canvas.getContext("2d");
-    }
-
-    function drawFrame() {
-        var x = 250;
-        var y = 250;
-        var radius = 250;
-        var color = '#FF00FF';
-
-        drawCircle(x, y, radius, color);
-    }
-
-    function drawHours(hours) {
-        const HOUR_PER_DAY = 12;
-
-        if (hours > HOUR_PER_DAY) {
-            hours -= HOUR_PER_DAY;
-        }
-
-        var radius = 40;
-        var color = '#FF0044';
-
-        var coordinates = getCoordinatesFromPercentage(hours / HOUR_PER_DAY);
-
-        drawCircle(coordinates.x, coordinates.y, radius, color);
-    }
-
-    function drawMinutes(minutes) {
-        const MINUTES_PER_HOUR = 60;
-
-        var radius = 30;
-        var color = '#440044';
-
-        var coordinates = getCoordinatesFromPercentage(minutes / MINUTES_PER_HOUR);
-
-        drawCircle(coordinates.x, coordinates.y, radius, color);
-    }
-
-    function drawSeconds(seconds) {
-        const SECONDS_PER_MINUTE = 60;
-
-        var radius = 20;
-        var color = '#FF2244';
-
-        var coordinates = getCoordinatesFromPercentage(seconds / SECONDS_PER_MINUTE);
-
-        drawCircle(coordinates.x, coordinates.y, radius, color);
-    }
-
-    function getCoordinatesFromPercentage(percentage) {
-        const RADIUS = 250;
-        const OFFSET_PERCENTAGE = -0.25;
-
-        var angle = percentageToAngle(OFFSET_PERCENTAGE) + percentageToAngle(percentage);
-
-        return applyAngle(250, 250, angle, RADIUS);
-    }
-
-    function percentageToAngle(degree) {
-        return degree * 2 * Math.PI;
-    }
-
-    function applyAngle(x, y, angle, distance) {
-        return {
-            x: x + (Math.cos(angle) * distance),
-            y: y + (Math.sin(angle) * distance)
-        };
-    };
-
-    function drawCircle(x, y, radius, color) {
-        canvas.fillStyle = color;
-        canvas.beginPath();
-        canvas.arc(x, y, radius, 0, Math.PI * 2);
-        canvas.closePath();
-        canvas.fill();
-    }
 }
+
+Clock.prototype.initCanvas = function (canvasId) {
+    this.canvas = document.getElementById(canvasId);
+    this.canvas = this.canvas.getContext("2d");
+}
+
+Clock.prototype.initDraw = function (canvasId) {
+    this.initCanvas(canvasId);
+    this.draw();
+    var t = this;
+    this.timerHandle = setInterval(function(){t.draw();}, 5);
+}
+
+Clock.prototype.drawFrame = function () {
+    var color = '#FF00FF';
+
+    this.drawCircle(ORIGO.x, ORIGO.y, RADIUS, color);
+}
+
+Clock.prototype.draw = function () {
+    this.clearCanvas();
+    this.drawFrame();
+
+    var date = new Date();
+
+    this.drawHours(date.getHours());
+    this.drawMinutes(date.getMinutes());
+    this.drawSeconds(date.getSeconds());
+}
+
+Clock.prototype.clearCanvas = function () {
+    this.canvas.clearRect (0, 0, CANVAS.width, CANVAS.height);
+}
+
+Clock.prototype.drawHours = function (hours) {
+    const HOUR_PER_DAY = 12;
+
+    if (hours > HOUR_PER_DAY) {
+        hours -= HOUR_PER_DAY;
+    }
+
+    var radius = 40;
+    var color = '#FF0044';
+
+    var coordinates = this.getCoordinatesFromPercentage(hours / HOUR_PER_DAY);
+
+    this.drawCircle(coordinates.x, coordinates.y, radius, color);
+}
+
+Clock.prototype.drawMinutes = function (minutes) {
+    const MINUTES_PER_HOUR = 60;
+
+    var radius = 30;
+    var color = '#440044';
+
+    var coordinates = this.getCoordinatesFromPercentage(minutes / MINUTES_PER_HOUR);
+
+    this.drawCircle(coordinates.x, coordinates.y, radius, color);
+}
+
+Clock.prototype.drawSeconds = function (seconds) {
+    const SECONDS_PER_MINUTE = 60;
+
+    var radius = 20;
+    var color = '#FF2244';
+
+    var coordinates = this.getCoordinatesFromPercentage(seconds / SECONDS_PER_MINUTE);
+
+    this.drawCircle(coordinates.x, coordinates.y, radius, color);
+}
+
+Clock.prototype.getCoordinatesFromPercentage = function (percentage) {
+    const OFFSET_PERCENTAGE = -0.25;
+
+    var angle = this.percentageToAngle(OFFSET_PERCENTAGE) + this.percentageToAngle(percentage);
+
+    return this.applyAngle(ORIGO.x, ORIGO.y, angle, RADIUS);
+}
+
+Clock.prototype.percentageToAngle = function (degree) {
+    return degree * 2 * Math.PI;
+}
+
+Clock.prototype.applyAngle = function (x, y, angle, distance) {
+    return {
+        x: x + (Math.cos(angle) * distance),
+        y: y + (Math.sin(angle) * distance)
+    };
+};
+
+Clock.prototype.drawCircle = function (x, y, radius, color) {
+    this.canvas.fillStyle = color;
+    this.canvas.beginPath();
+    this.canvas.arc(x, y, radius, 0, Math.PI * 2);
+    this.canvas.closePath();
+    this.canvas.fill();
+}
+
+Clock.prototype.constructor = function Clock() {
+    var canvas;
+    var timerHandle;
+}
+
 
