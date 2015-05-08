@@ -1,38 +1,53 @@
-function Dial(canvas, x, y, radius, width)
+function Dial(origo, radius, width, division, offsetAngle)
 {
-    this.canvas = canvas;
-    this.x = x;
-    this.y = y;
-    this.radius = radius;
-    this.width = width;
+    this.width    = width;
+    this.division = division;
+
+    this.halfWidth   = this.width / 2;
+    this.circle      = new Circle(origo, radius, offsetAngle);
+    this.innerCircle = new Circle(origo, radius - this.halfWidth, offsetAngle);
+    this.outerCircle = new Circle(origo, radius + this.halfWidth, offsetAngle);
 }
 
-Dial.prototype.draw = function (color) {
-    var division = 60;
-    var halfWidth = this.width / 2;
-    var circle = new Circle(this.canvas, this.x, this.y, this.radius);
-    var innerCircle = new Circle(this.canvas, this.x, this.y, this.radius - halfWidth);
-    var outerCircle = new Circle(this.canvas, this.x, this.y, this.radius + halfWidth);
-
-    for (var i = 0; i < division; i++) {
-        var oneStepPercentage = ((360 / division) * i) / 360;
-
-        if (i % 5 === 0) {
-            var textCoordinate = circle.getCoordinatesFromPercentage(oneStepPercentage);
-            this.canvas.font = this.width + 'pt Calibri';
-            this.canvas.textAlign = 'center';
-            this.canvas.fillText(i, textCoordinate.x, textCoordinate.y + halfWidth);
-        }
-        else {
-            var innerCoordinate = innerCircle.getCoordinatesFromPercentage(oneStepPercentage);
-            var outerCoordinate = outerCircle.getCoordinatesFromPercentage(oneStepPercentage);
-
-            this.canvas.beginPath();
-            this.canvas.moveTo(innerCoordinate.x, innerCoordinate.y);
-            this.canvas.lineTo(outerCoordinate.x, outerCoordinate.y);
-            this.canvas.stroke();
-            this.canvas.closePath();
-        }
+Dial.prototype.draw = function (canvas, markColor) {
+    for (var markNumber = 0; markNumber < this.division; markNumber++) {
+        this.drawMark(canvas, markColor, markNumber);
     }
+}
+
+Dial.prototype.drawMark = function (canvas, markColor, markNumber) {
+    var currentAngle = this.getMarkAngle(markNumber);
+
+    if (markNumber % 5 === 0) {
+        this.drawDivisionNumber(canvas, markColor, markNumber, currentAngle);
+        return;
+    }
+
+    this.drawDivisionLine(canvas, markColor, currentAngle);
+}
+
+Dial.prototype.getMarkAngle = function (markNumber) {
+    return (360 / this.division) * markNumber;
+}
+
+Dial.prototype.drawDivisionLine = function (canvas, markColor, currentAngle) {
+    var innerCoordinate = this.innerCircle.applyAngle(currentAngle);
+    var outerCoordinate = this.outerCircle.applyAngle(currentAngle);
+
+    var line = new Line(innerCoordinate, outerCoordinate);
+    line.draw(canvas, markColor);
+}
+
+Dial.prototype.drawDivisionNumber = function (canvas, markColor, number, currentAngle) {
+    var textCoordinate = this.circle.applyAngle(currentAngle);
+
+    canvas.fillStyle = markColor;
+    canvas.font = this.width + 'pt Calibri';
+    canvas.textAlign = 'center';
+    canvas.fillText(number, textCoordinate.x, textCoordinate.y + this.halfWidth);
+}
+
+Dial.prototype.getPositionByPercentage = function (percentage) {
+    return this.circle.getCoordinatesFromPercentage(percentage);
 }
 

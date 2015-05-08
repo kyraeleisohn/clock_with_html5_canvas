@@ -4,15 +4,15 @@
     <meta charset="UTF-8">
     <title>Clock</title>
     <script src="node_modules/jquery/dist/jquery.js"></script>
+    <script src="line.js"></script>
     <script src="circle.js"></script>
     <script src="dial.js"></script>
     <script src="clock.js"></script>
     <script>
     $(window).load(function ()
     {
-
         clock = new Clock("clock");
-        clock.initDraw("clock");
+        clock.start();
     });
     </script>
 </head>
