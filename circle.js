@@ -5,7 +5,6 @@ function Circle(origo, radius, offsetAngle) {
 }
 
 Circle.prototype.draw = function (canvas, fillColor, lineWidth, lineColor) {
-
     canvas.beginPath();
     canvas.arc(this.origo.x, this.origo.y, this.radius, 0, Math.PI * 2);
     canvas.fillStyle = fillColor;
